@@ -1,103 +1,383 @@
-import Image from "next/image";
+// React Hooks Documentation with Sidebar Navigation
 
-export default function Home() {
+"use client";
+
+import { useState, useEffect, useMemo, useCallback, useReducer, useId } from "react";
+import { useTheme } from "../../context/ThemeContext";
+import { Action } from "../../type/type";
+import { Check, Copy, Menu, Moon, Sun, X } from "lucide-react";
+
+const hookList = [
+  "useState",
+  "useEffect",
+  "useContext",
+  "useMemo",
+  "useCallback",
+  "useReducer",
+  "useId",
+];
+
+export default function HooksDocumentation() {
+  const [selectedHook, setSelectedHook] = useState<string>("useState");
+  const [count, setCount] = useState(0);
+  const [message, setMessage] = useState("");
+  const { theme, toggleTheme } = useTheme();
+  const doubled = useMemo(() => count * 2, [count]);
+  const handleClick = useCallback(() => setCount((c) => c + 1), []);
+  const reducerFn = (state: number, action: Action): number => {
+    switch (action.type) {
+      case "increment":
+        return state + 1;
+      case "decrement":
+        return state - 1;
+      default:
+        return state;
+    }
+  };
+  const [state, dispatch] = useReducer(reducerFn, 0);
+  const userId = useId();
+
+  useEffect(() => {
+    setMessage("Component mounted or count changed");
+  }, [count]);
+
+  const renderContent = () => {
+    const [copied, setCopied] = useState<string | null>(null);
+
+    const handleCopy = (text: string) => {
+      navigator.clipboard.writeText(text);
+      setCopied(text);
+      setTimeout(() => setCopied(null), 2000);
+    };
+
+    switch (selectedHook) {
+      case "useState":
+        return (
+          <div className="space-y-4">
+            <h2 className="text-2xl sm:text-3xl font-bold">useState</h2>
+            <p className={`
+              text-xl text-gray-700 leading-relaxed mb-4
+              ${theme === "dark" ? "text-slate-400" : ""}
+              `}>Manages local component state.</p>
+
+            <pre className="w-full max-w-4xl relative bg-gray-800 text-white p-4 rounded text-sm sm:text-base">
+              <button
+                onClick={() => handleCopy("const [count, setCount] = useState(0);")}
+                className="cursor-pointer transition-all duration-300 absolute top-2 right-2 text-white bg-gray-600 p-2 rounded-full hover:bg-gray-500"
+              >
+                {copied === "const [count, setCount] = useState(0);" ? (
+                  <Check className="w-4 h-4 text-green-400 animate-pulse transition-opacity duration-300" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </button>
+              <div className="overflow-x-auto">
+                <code className="block whitespace-pre">
+                {`const [count, setCount] = useState(0);`}
+                </code>
+              </div>
+            </pre>
+
+            <div className="flex flex-wrap items-center gap-2 mt-4">
+              <button className="bg-gray-700 text-white p-2 px-3 rounded-lg hover:bg-gray-600" onClick={() => setCount(count - 1)}>Decrement</button>
+              <span>{count}</span>
+              <button className="bg-gray-700 text-white p-2 px-3 rounded-lg hover:bg-gray-600" onClick={() => setCount(count + 1)}>Increment</button>
+            </div>
+          </div>
+        );
+
+      case "useEffect":
+        return (
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold">useEffect</h2>
+            <p className={`
+              text-xl text-gray-700 leading-relaxed mb-4
+              ${theme === "dark" ? "text-slate-400" : ""}
+              `}>Runs side effects after render (like fetching data or subscriptions).</p>
+            <pre className="w-full max-w-4xl relative bg-gray-800 text-white p-4 rounded text-sm sm:text-base">
+              <button
+                onClick={() => handleCopy("useEffect(() => {\n  // effect\n  return () => {\n    // cleanup\n  };\n}, [dependencies]);")}
+                className="cursor-pointer transition-all duration-300 absolute top-2 right-2 text-white bg-gray-600 p-2 rounded-full hover:bg-gray-500"
+              >
+                {copied === "const [count, setCount] = useState(0);" ? (
+                  <Check className="w-4 h-4 text-green-400 animate-pulse transition-opacity duration-300" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </button>
+
+              <div className="overflow-x-auto">
+                <code className="block whitespace-pre">
+                  {`useEffect(() => {
+                  // effect
+                  return () => {
+                    // cleanup
+                  };
+                }, [dependencies]);`}
+                </code>
+              </div>
+            </pre>
+            <p className={`
+              text-xl text-gray-700 leading-relaxed mb-4
+              ${theme === "dark" ? "text-slate-400" : ""}
+              `}>{message}</p>
+          </div>
+        );
+
+      case "useContext":
+        return (
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold">useContext</h2>
+            <p className={`
+              text-xl text-gray-700 leading-relaxed mb-4
+              ${theme === "dark" ? "text-slate-400" : ""}
+              `}>Accesses context values from React Context API.</p>
+              <pre className="w-full max-w-4xl relative bg-gray-800 text-white p-4 rounded text-sm sm:text-base">
+              <button
+                onClick={() => handleCopy("const theme = useContext(ThemeContext);")}
+                className="cursor-pointer transition-all duration-300 absolute top-2 right-2 text-white bg-gray-600 p-2 rounded-full hover:bg-gray-500"
+              >
+                {copied === "const [count, setCount] = useState(0);" ? (
+                  <Check className="w-4 h-4 text-green-400 animate-pulse transition-opacity duration-300" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </button>
+              <div className="overflow-x-auto">
+                <code className="block whitespace-pre">
+                {`const theme = useContext(ThemeContext);`}
+                </code>
+              </div>
+            </pre>
+            <p className={`
+              text-xl text-gray-700 leading-relaxed mb-4
+              ${theme === "dark" ? "text-slate-400" : ""}
+              `}>Theme: {theme}</p>
+            <button className="bg-gray-700 text-white p-2 px-3 rounded-lg hover:bg-gray-600" onClick={toggleTheme}>Toggle Theme</button>
+          </div>
+        );
+
+      case "useMemo":
+        return (
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold">useMemo</h2>
+            <p className={`
+              text-xl text-gray-700 leading-relaxed mb-4
+              ${theme === "dark" ? "text-slate-400" : ""}
+              `}>Memoizes a value to avoid expensive recalculations.</p>
+            <pre className="w-full max-w-4xl relative bg-gray-800 text-white p-4 rounded text-sm sm:text-base">
+              <button
+                onClick={() => handleCopy("const doubled = useMemo(() => count * 2, [count]);")}
+                className="cursor-pointer transition-all duration-300 absolute top-2 right-2 text-white bg-gray-600 p-2 rounded-full hover:bg-gray-500"
+              >
+                {copied === "const [count, setCount] = useState(0);" ? (
+                  <Check className="w-4 h-4 text-green-400 animate-pulse transition-opacity duration-300" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </button>
+              <div className="overflow-x-auto">
+                <code className="block whitespace-pre">
+                {`const doubled = useMemo(() => count * 2, [count]);`}
+                </code>
+              </div>
+            </pre>
+            <p className={`
+              text-xl text-gray-700 leading-relaxed mb-4
+              ${theme === "dark" ? "text-slate-400" : ""}
+              `}>Doubled: {doubled}</p>
+          </div>
+        );
+
+      case "useCallback":
+        return (
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold">useCallback</h2>
+            <p className={`
+              text-xl text-gray-700 leading-relaxed mb-4
+              ${theme === "dark" ? "text-slate-400" : ""}
+              `}>Memoizes a function to prevent re-creation on each render.</p>
+            <pre className="w-full max-w-4xl relative bg-gray-800 text-white p-4 rounded text-sm sm:text-base">
+              <button
+                onClick={() => handleCopy("const handleClick = useCallback(() => setCount(c => c + 1), []);")}
+                className="cursor-pointer transition-all duration-300 absolute top-2 right-2 text-white bg-gray-600 p-2 rounded-full hover:bg-gray-500"
+              >
+                {copied === "const [count, setCount] = useState(0);" ? (
+                  <Check className="w-4 h-4 text-green-400 animate-pulse transition-opacity duration-300" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </button>
+              <div className="overflow-x-auto">
+                <code className="block whitespace-pre">
+                {`const handleClick = useCallback(() => setCount(c => c + 1), []);`}
+                </code>
+              </div>
+            </pre>
+            <p className={`
+              text-xl text-gray-700 leading-relaxed mb-4
+              ${theme === "dark" ? "text-slate-400" : ""}
+              `}>Count: {count}</p>
+            <button className="bg-gray-700 text-white p-2 px-3 rounded-lg hover:bg-gray-600" onClick={handleClick}>Increment</button>
+          </div>
+        );
+
+      case "useReducer":
+        return (
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold">useReducer</h2>
+            <p className={`
+              text-xl text-gray-700 leading-relaxed mb-4
+              ${theme === "dark" ? "text-slate-400" : ""}
+              `}>Manages complex state logic using a reducer function.</p>
+            <pre className="w-full max-w-4xl relative bg-gray-800 text-white p-4 rounded text-sm sm:text-base">
+              <button
+                onClick={() => handleCopy("const [state, dispatch] = useReducer(reducer, initialState);")}
+                className="cursor-pointer transition-all duration-300 absolute top-2 right-2 text-white bg-gray-600 p-2 rounded-full hover:bg-gray-500"
+              >
+                {copied === "const [count, setCount] = useState(0);" ? (
+                  <Check className="w-4 h-4 text-green-400 animate-pulse transition-opacity duration-300" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </button>
+              <div className="overflow-x-auto">
+                <code className="block whitespace-pre">
+                {`const [state, dispatch] = useReducer(reducer, initialState);`}
+                </code>
+              </div>
+            </pre>
+            <p className={`
+              text-xl text-gray-700 leading-relaxed mb-4
+              ${theme === "dark" ? "text-slate-400" : ""}
+              `}>State: {state}</p>
+            <button className="bg-gray-700 text-white p-2 px-3 rounded-lg hover:bg-gray-600" onClick={() => dispatch({ type: "increment" })}>Increment</button>
+            <button className="bg-gray-700 text-white p-2 px-3 rounded-lg hover:bg-gray-600" onClick={() => dispatch({ type: "decrement" })}>Decrement</button>
+          </div>
+        );
+
+      case "useId":
+        return (
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold">useId</h2>
+            <p className={`
+              text-xl text-gray-700 leading-relaxed mb-4
+              ${theme === "dark" ? "text-slate-400" : ""}
+              `}>Generates unique ID for accessibility or SSR consistency.</p>
+            <pre className="w-full max-w-4xl relative bg-gray-800 text-white p-4 rounded text-sm sm:text-base">
+              <button
+                onClick={() => handleCopy("const id = useId();")}
+                className="cursor-pointer transition-all duration-300 absolute top-2 right-2 text-white bg-gray-600 p-2 rounded-full hover:bg-gray-500"
+              >
+                {copied === "const [count, setCount] = useState(0);" ? (
+                  <Check className="w-4 h-4 text-green-400 animate-pulse transition-opacity duration-300" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </button>
+              <div className="overflow-x-auto">
+                <code className="block whitespace-pre">
+                  {`const id = useId();`}
+                </code>
+              </div>
+            </pre>
+            <p className={`
+              text-xl text-gray-700 leading-relaxed mb-4
+              ${theme === "dark" ? "text-slate-400" : ""}
+              `}>ID: {userId}</p>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  <div
+    className={`
+      flex w-full min-h-screen
+      ${theme === "dark" ? "bg-slate-900" : "bg-gray-100"}
+    `}
+  >
+    {/* Mobile Nav Toggle */}
+    <button
+      className="md:hidden fixed top-4 right-4 z-50 bg-gray-800 text-white p-2 rounded shadow-lg"
+      onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+    >
+      {isMobileNavOpen ? (
+        <X className="w-6 h-6" />
+      ) : (
+        <Menu className="w-6 h-6" />
+      )}
+    </button>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    {/* Sidebar */}
+    <aside
+      className={`
+        fixed top-0 left-0 z-40 transform transition-transform duration-300
+        w-full md:w-64 h-screen p-4
+        ${theme === "dark" ? "bg-gray-800 text-white" : "bg-white"}
+        ${isMobileNavOpen ? "translate-x-0" : "-translate-x-full"}
+        md:translate-x-0 md:static md:block
+      `}
+    >
+      <h1 className="text-xl font-bold mb-4">React Hooks</h1>
+      <ul className="space-y-2">
+        {hookList.map((hook) => (
+          <li
+            key={hook}
+            className={`cursor-pointer p-2 rounded transition-all duration-200
+              ${
+                selectedHook === hook
+                  ? theme === "dark"
+                    ? "bg-gray-700 text-white font-semibold"
+                    : "bg-gray-200 text-black font-semibold"
+                  : theme === "dark"
+                    ? "text-white hover:bg-gray-700"
+                    : "text-black hover:bg-gray-200"
+              }
+            `}
+            onClick={() => {
+              setSelectedHook(hook);
+              setIsMobileNavOpen(false); // Close sidebar on mobile
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            {hook}
+          </li>
+        ))}
+      </ul>
+    </aside>
+
+    {/* Main Content */}
+    <main
+      className={`
+        flex-1 min-h-screen space-y-4 overflow-auto p-5 overflow-y-scroll overflow-x-hidden xs:p-3 md:px-8 shadow-inner
+        ${theme === "dark" ? "text-white" : "bg-white"}
+      `}
+    >
+      {/* Header with Theme Toggle Icons */}
+      <div className="flex items-center justify-end mb-4">
+        <h1 className="text-2xl font-bold hidden">React Hooks</h1>
+        <div className="flex items-center">
+          <button
+            onClick={toggleTheme}
+            className="cursor-pointer transition-all duration-300"
           >
-            Read our docs
-          </a>
+            {theme === "dark" ? (
+              <Sun className="w-6 h-6" />
+            ) : (
+              <Moon className="w-6 h-6" />
+            )}
+          </button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+      </div>
+      <div className="mt-4">
+        {renderContent()}
+      </div>
+    </main>
+  </div>
+);
 }
