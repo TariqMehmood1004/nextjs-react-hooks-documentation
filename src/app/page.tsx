@@ -40,9 +40,10 @@ export default function HooksDocumentation() {
   useEffect(() => {
     setMessage("Component mounted or count changed");
   }, [count]);
+  
+  const [copied, setCopied] = useState<string | null>(null);
 
   const renderContent = () => {
-    const [copied, setCopied] = useState<string | null>(null);
 
     const handleCopy = (text: string) => {
       navigator.clipboard.writeText(text);
