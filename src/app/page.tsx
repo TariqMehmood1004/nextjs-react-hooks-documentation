@@ -311,7 +311,9 @@ export default function HooksDocumentation() {
       {isMobileNavOpen ? (
         <X className="w-6 h-6" />
       ) : (
+        <>
         <Menu className="w-6 h-6" />
+        </>
       )}
     </button>
 
@@ -349,6 +351,28 @@ export default function HooksDocumentation() {
             {hook}
           </li>
         ))}
+        {isMobileNavOpen ? <li>
+          <div className="w-full flex items-center">
+          <button
+            onClick={toggleTheme}
+            className={`cursor-pointer p-2 rounded transition-all duration-200
+              ${theme === "dark" ? "text-white" : "text-black"}
+            `}
+          >
+            {theme === "dark" ? (
+              <div className="flex items-center space-x-2">
+                <Sun className="w-6 h-6" />
+                <span>Light</span>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Moon className="w-6 h-6" />
+                <span>Dark</span>
+              </div>
+            )}
+          </button>
+        </div>
+        </li> : null}
       </ul>
     </aside>
 
